@@ -6,11 +6,11 @@ import (
 )
 
 func main() {
-	v := secret.Memory("fake-keys")
+	v := secret.File("Eshaaaaan", ".secrets")
 
-	v.Set("demo-key", "some-value ")
+	v.Set("Eshan-demo", "some-value ")
 
-	plain, err := v.Get("demo-key")
+	plain, err := v.Get("Eshan-demo")
 	if err != nil {
 		panic(err)
 	}

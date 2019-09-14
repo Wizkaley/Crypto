@@ -1,42 +1,110 @@
 package secret
 
 import (
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"os"
 	"secret/encrypt"
+	"strings"
+	"sync"
 )
 
-// Memory on Disk
-func Memory(encodingKey string) Vault {
-	return Vault{
+func File(encodingKey, file string) *Vault {
+	return &Vault{
 		encodingKey: encodingKey,
-		keyValues:   make(map[string]string),
+		filepath:    file,
 	}
 }
 
-// Vault Struct
 type Vault struct {
 	encodingKey string
+	filepath    string
+	mutex       sync.Mutex
 	keyValues   map[string]string
 }
 
-// Get a Vault value for the specified key
+func (v *Vault) loadKeyValues() error {
+	f, err := os.Open(v.filepath)
+	if err != nil {
+		v.keyValues = make(map[string]string)
+		return nil
+	}
+	defer f.Close()
+	var sb strings.Builder
+	_, err = io.Copy(&sb, f)
+
+	if err != nil {
+		return err
+	}
+	decryptedJSON, err := encrypt.Decrypt(v.encodingKey, sb.String())
+
+	r := strings.NewReader(decryptedJSON)
+
+	dec := json.NewDecoder(r)
+	err = dec.Decode(&v.keyValues)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (v *Vault) Get(key string) (string, error) {
-	hex := v.keyValues[key]
-	res, err := encrypt.Decrypt(key, hex)
+
+	v.mutex.Lock()
+	defer v.mutex.Unlock()
+	err := v.loadKeyValues()
 	if err != nil {
 		return "", err
 	}
 
-	return res, nil
+	value, ok := v.keyValues[key]
+
+	if !ok {
+		return "", errors.New("Secret : no values for that key")
+	}
+
+	return value, nil
 }
 
-// Set a Vault Value for with a Key
-func (v *Vault) Set(key, text string) error {
-	//v.keyValues[key] = text
+func (v *Vault) Set(key, value string) error {
 
-	res, err := encrypt.Encrypt(key, text)
+	v.mutex.Lock()
+	defer v.mutex.Unlock()
+	err := v.loadKeyValues()
+
 	if err != nil {
 		return err
 	}
-	v.keyValues[key] = res
+
+	v.keyValues[key] = value
+	err = v.saveKeyValues()
+	return nil
+}
+
+func (v *Vault) saveKeyValues() error {
+	var sb strings.Builder
+	enc := json.NewEncoder(&sb)
+	err := enc.Encode(v.keyValues)
+	if err != nil {
+		return err
+	}
+
+	encryptedJSON, err := encrypt.Encrypt(v.encodingKey, sb.String())
+	if err != nil {
+		return err
+	}
+	f, err := os.OpenFile(v.filepath, os.O_RDWR|os.O_CREATE, 0755)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	_, err = fmt.Fprint(f, encryptedJSON)
+	if err != nil {
+		return err
+	}
 	return nil
 }

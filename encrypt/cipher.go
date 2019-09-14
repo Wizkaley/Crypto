@@ -11,15 +11,11 @@ import (
 	"io"
 )
 
-// Encrypt will take in a String Key and a Plaintext and will convert it to a
-// Hex represented value
+// Encrypt will take in a key and plaintext and return a hex representation
+// of the encrypted value.
+// This code is based on the standard library examples at:
+//   - https://golang.org/pkg/crypto/cipher/#NewCFBEncrypter
 func Encrypt(key, plaintext string) (string, error) {
-	// Load your secret key from a safe place and reuse it across multiple
-	// NewCipher calls. If you want to convert a passphrase to a key, use a suitable
-	// package like bcrypt or scrypt.
-
-	// The IV needs to be unique, but not secure. Therefore it's common to
-	// include it at the beginning of the ciphertext.
 	block, err := newCipherBlock(key)
 	if err != nil {
 		return "", err
@@ -34,31 +30,26 @@ func Encrypt(key, plaintext string) (string, error) {
 	stream := cipher.NewCFBEncrypter(block, iv)
 	stream.XORKeyStream(ciphertext[aes.BlockSize:], []byte(plaintext))
 
-	// It's important to remember that ciphertexts must be authenticated
-	// (i.e. by using crypto/hmac) as well as being encrypted in order to
-	// be secure.
 	return fmt.Sprintf("%x", ciphertext), nil
 }
 
-// Decrypt will take in a Key and a hex representation of the ciphertext
-// and Decrpyt it. Will return a string
-// This code is Based of Examples from Go Doc
-func Decrypt(key string, cipherHex string) (string, error) {
-	// Load your secret key from a safe place and reuse it across multiple
-	// NewCipher calls. If you want to convert a passphrase to a key, use a suitable
-	// package like bcrypt or scrypt.
-
+// Decrypt will take in a key and a cipherHex (hex representation of
+// the ciphertext) and decrypt it.
+// This code is based on the standard library examples at:
+//   - https://golang.org/pkg/crypto/cipher/#NewCFBDecrypter
+func Decrypt(key, cipherHex string) (string, error) {
 	block, err := newCipherBlock(key)
 	if err != nil {
 		return "", err
 	}
 
-	//cipherHex :=
-	//key, _ := hex.DecodeString("6368616e676520746869732070617373")
-	ciphertext, _ := hex.DecodeString(cipherHex)
+	ciphertext, err := hex.DecodeString(cipherHex)
+	if err != nil {
+		return "", err
+	}
 
 	if len(ciphertext) < aes.BlockSize {
-		return "", errors.New("Cipher too short")
+		return "", errors.New("encrypt: cipher too short")
 	}
 	iv := ciphertext[:aes.BlockSize]
 	ciphertext = ciphertext[aes.BlockSize:]
@@ -72,13 +63,7 @@ func Decrypt(key string, cipherHex string) (string, error) {
 
 func newCipherBlock(key string) (cipher.Block, error) {
 	hasher := md5.New()
-
 	fmt.Fprint(hasher, key)
-
 	cipherKey := hasher.Sum(nil)
-	block, err := aes.NewCipher(cipherKey)
-	if err != nil {
-		return nil, err
-	}
-	return block, nil
+	return aes.NewCipher(cipherKey)
 }
