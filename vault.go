@@ -17,6 +17,11 @@ func File(encodingKey, filepath string) *Vault {
 	}
 }
 
+var (
+	DecryptReaderVar = cipher.DecryptReader
+	EncryptWriterVar = cipher.EncryptWriter
+)
+
 type Vault struct {
 	encodingKey string
 	filepath    string
@@ -31,7 +36,7 @@ func (v *Vault) load() error {
 		return nil
 	}
 	defer f.Close()
-	r, err := cipher.DecryptReader(v.encodingKey, f)
+	r, err := DecryptReaderVar(v.encodingKey, f)
 	if err != nil {
 		return err
 	}
@@ -49,7 +54,7 @@ func (v *Vault) save() error {
 		return err
 	}
 	defer f.Close()
-	w, err := cipher.EncryptWriter(v.encodingKey, f)
+	w, err := EncryptWriterVar(v.encodingKey, f)
 	if err != nil {
 		return err
 	}

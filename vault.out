@@ -1,0 +1,22 @@
+mode: set
+secret/vault.go:13.48,18.2 1 1
+secret/vault.go:32.30,34.16 2 1
+secret/vault.go:38.2,40.16 3 1
+secret/vault.go:43.2,43.27 1 1
+secret/vault.go:34.16,37.3 2 1
+secret/vault.go:40.16,42.3 1 1
+secret/vault.go:46.50,49.2 2 1
+secret/vault.go:51.30,53.16 2 1
+secret/vault.go:56.2,58.16 3 1
+secret/vault.go:61.2,61.28 1 1
+secret/vault.go:53.16,55.3 1 1
+secret/vault.go:58.16,60.3 1 1
+secret/vault.go:64.51,67.2 2 1
+secret/vault.go:69.49,74.16 4 1
+secret/vault.go:77.2,78.9 2 1
+secret/vault.go:81.2,81.19 1 1
+secret/vault.go:74.16,76.3 1 1
+secret/vault.go:78.9,80.3 1 1
+secret/vault.go:84.46,88.16 4 1
+secret/vault.go:91.2,93.12 3 1
+secret/vault.go:88.16,90.3 1 1

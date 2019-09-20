@@ -1,0 +1,20 @@
+mode: set
+secret/cipher/cipher.go:18.66,20.16 2 1
+secret/cipher/cipher.go:23.2,23.47 1 1
+secret/cipher/cipher.go:20.16,22.3 1 1
+secret/cipher/cipher.go:28.75,30.58 2 1
+secret/cipher/cipher.go:33.2,34.16 2 1
+secret/cipher/cipher.go:37.2,38.32 2 1
+secret/cipher/cipher.go:41.2,41.51 1 1
+secret/cipher/cipher.go:30.58,32.3 1 1
+secret/cipher/cipher.go:34.16,36.3 1 1
+secret/cipher/cipher.go:38.32,40.3 1 1
+secret/cipher/cipher.go:44.66,46.16 2 1
+secret/cipher/cipher.go:49.2,49.47 1 1
+secret/cipher/cipher.go:46.16,48.3 1 1
+secret/cipher/cipher.go:55.75,58.31 3 1
+secret/cipher/cipher.go:61.2,62.16 2 1
+secret/cipher/cipher.go:65.2,65.51 1 1
+secret/cipher/cipher.go:58.31,60.3 1 1
+secret/cipher/cipher.go:62.16,64.3 1 1
+secret/cipher/cipher.go:68.55,73.2 4 1
